@@ -15,13 +15,13 @@ from enum import IntEnum
 
 #Globale Variablen............................................................................................
 ROBOT_DIRECTION_FRONT_INDEX = 0
-ROBOT_DIRECTION_RIGHT_FRONT_INDEX = 315
-ROBOT_DIRECTION_RIGHT_INDEX = 270
-ROBOT_DIRECTION_RIGHT_REAR_INDEX = 225
-ROBOT_DIRECTION_REAR_INDEX = 180
-ROBOT_DIRECTION_LEFT_REAR_INDEX = 135
+ROBOT_DIRECTION_LEFT_FRONT_INDEX = 60
 ROBOT_DIRECTION_LEFT_INDEX = 90
-ROBOT_DIRECTION_LEFT_FRONT_INDEX = 45
+ROBOT_DIRECTION_LEFT_REAR_INDEX = 120
+ROBOT_DIRECTION_REAR_INDEX = 180
+ROBOT_DIRECTION_RIGHT_REAR_INDEX = 240
+ROBOT_DIRECTION_RIGHT_INDEX = 270
+ROBOT_DIRECTION_RIGHT_FRONT_INDEX = 300
 #.............................................................................................................
 
 
@@ -64,6 +64,7 @@ class WallFollower(Node):
         self.dist_thresh_wf = 0.3         #m
         self.dist_hysteresis_wf = 0.02    #m
         self.dist_laser_offset = 0.03     #m
+        self.minimum_distance_laser = 0.1
 
         self.valid_lidar_data = False
 
@@ -103,11 +104,11 @@ class WallFollower(Node):
             if self.front_dist > dist_min:
                 #wenn er knapp bei der wand ist dreh langsam
                 if abs(self.front_dist -dist_min < 0.2):
-                    print("Roboter dreht\n")
+                    print("Roboter dreht langsam\n")
                     msg.angular.z = self.turning_speed_wf_slow
                 #sonst schnell
                 else:
-                    print("Roboter dreht\n")
+                    print("Roboter dreht schnell\n")
                     msg.angular.z = self.turning_speed_wf_fast
             else:
                 print("WF_STATE_DRIVE2Wall")
@@ -149,6 +150,41 @@ class WallFollower(Node):
         #State FollowWall
         elif self.wallfollower_state == WallFollowerStates.WF_STATE_FOLLOWWALL:
             print("\nFollow Wall\n")
+            fd_thresh = self.dist_thresh_wf + self.dist_laser_offset
+            rd_thresh = self.dist_thresh_wf
+
+            lf = self.leftfront_dist
+            lr = self.leftrear_dist
+
+            forward_speed_wf = self.calc_linear_speed()
+
+            if (self.front_dist > (fd_thresh + self.dist_hysteresis_wf)):
+                #Nach Links lenken -> Abstand wurde zu groß
+                if self.left_dist > (rd_thresh + self.dist_hysteresis_wf):
+                    #Verhindert ein Aufschwingen, 
+                    #Vergleichswert self.dist_hysteresis_wf ist nicht optimal
+                    #-> eigenen Parameter erstellen und Winkel vergleichen!
+                    if (lr - lf) < self.dist_hysteresis_wf:
+                        msg.angular.z = self.turning_speed_wf_slow
+                    msg.linear.x = forward_speed_wf
+                #Nach Rechts lenken -> Abstand wurde unterschritten
+                elif self.left_dist < (rd_thresh - self.dist_hysteresis_wf):
+                    if (lf - lr) < self.dist_hysteresis_wf:
+                        msg.angular.z = -self.turning_speed_wf_slow
+                    msg.linear.x = forward_speed_wf
+                #Geradeaus fahren
+                else:
+                    msg.linear.x = forward_speed_wf
+            else: #Wand oder Ecke erreicht!
+                turn_direction = self.align_left()
+                msg.angular.z = self.turning_speed_wf_slow * turn_direction
+                if turn_direction == 0:
+                    print("WF_STATE_ROTATE2WALL")
+                    self.wallfollower_state_input_dist = self.distances_history[-1]
+                    self.wallfollower_state = WallFollowerStates.WF_STATE_ROTATE2WALL
+        else:
+            self.wallfollower_state = WallFollowerStates.WF_STATE_DETECTWALL
+
 
 
 
@@ -224,3 +260,6 @@ def main(args=None):
     wallfollower.destroy_node
     rclpy.shutdown
 #..............................................................................................................
+
+if __name__ == '__main__':
+    main()
