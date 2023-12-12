@@ -119,7 +119,7 @@ class WallFollower(Node):
             print("\nDetect Wall\n")
             dist_min = min(self.distances_history[-1])
             #links drehen bis zum kleinsten Abstand zu einer Wand
-            if (self.front_dist) > (dist_min):
+            if (self.front_dist) > ((dist_min) + self.dist_hysteresis_wf):
                 #wenn er knapp bei der wand ist dreh langsam
                 if abs((self.front_dist - dist_min)) < 0.2:
                     msg.angular.z = self.turning_speed_wf_slow
