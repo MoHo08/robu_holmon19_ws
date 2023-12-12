@@ -42,16 +42,20 @@ class WallFollower(Node):
     def __init__ (self):                                            
         super().__init__('Wallfollower')
         self.scan_subscriber = self.create_subscription(LaserScan, "/scan", self.scan_callback, qos_profile_sensor_data)
-        self.cmd_vel_publisher = self.create_publisher(Twist, "/cmd_vel", qos_profile_sensor_data)
+        self.cmd_vel_publisher = self.create_publisher(Twist, "/cmd_vel", 10)
 
         #+++++ Variablen +++++
-        self.left_dist = 999999.9
-        self.leftfront_dist = 999999.9
-        self.front_dist = 999999.9
-        self.rightfront_dist = 999999.9
-        self.right_dist = 999999.9
-        self.rear_dist = 999999.9
-        self.distances = []
+        self.left_dist = 999999.9 # Left
+        self.leftfront_dist = 999999.9 # Left-front
+        self.front_dist = 999999.9 # Front
+        self.rightfront_dist = 999999.9 # Right-front
+        self.right_dist = 999999.9 # Right
+        self.rightrear_dist = 999999.9
+        self.rear_dist = 999999.9 # Rear
+        self.leftrear_dist = 999999.9
+
+        self.distances_history = []
+        self.distances_histroy_size = 1
 
         self.wallfollower_state = WallFollowerStates.WF_STATE_INVALID
 
@@ -66,14 +70,27 @@ class WallFollower(Node):
         self.dist_laser_offset = 0.03     #m
         self.minimum_distance_laser = 0.1
 
-        self.valid_lidar_data = False
-
         self.timer = self.create_timer(0.2, self.timer_callback)
 
     #Timer Callback 
     def timer_callback(self):
         if self.valid_lidar_data:        #warten bis gültige Lidar Daten vorhanden sind
             self.follow_wall()
+
+    #Distances History
+    def get_dist_avg_history(self, pos):
+        sum = 0.0
+        number_of_valid_values = 0
+
+        for distances in self.distances_history:
+            if (distances[pos] > self.minimum_distance_laser):
+                sum = sum + distances[pos]
+                number_of_valid_values = number_of_valid_values +1
+        
+        if (number_of_valid_values > 0):
+            return sum / number_of_valid_values
+        else:
+            return -1
 
 
     #Regler, State-Maschine
@@ -100,18 +117,17 @@ class WallFollower(Node):
         #State Detectwall
         elif self.wallfollower_state == WallFollowerStates.WF_STATE_DETECTWALL:
             print("\nDetect Wall\n")
-            dist_min = min(self.distances)
-            if self.front_dist > dist_min:
+            dist_min = min(self.distances_history[-1])
+            #links drehen bis zum kleinsten Abstand zu einer Wand
+            if (self.front_dist) > (dist_min):
                 #wenn er knapp bei der wand ist dreh langsam
-                if abs(self.front_dist -dist_min < 0.2):
-                    print("Roboter dreht langsam\n")
+                if abs((self.front_dist - dist_min)) < 0.2:
                     msg.angular.z = self.turning_speed_wf_slow
                 #sonst schnell
                 else:
-                    print("Roboter dreht schnell\n")
                     msg.angular.z = self.turning_speed_wf_fast
             else:
-                print("WF_STATE_DRIVE2Wall")
+                print("WF_STATE_DRIVE2WALL")
                 self.wallfollower_state = WallFollowerStates.WF_STATE_DRIVE2WALL
 
 
@@ -196,7 +212,7 @@ class WallFollower(Node):
     #Methode um Geschwindigkeit (langsam oder schnell) zu berechnen
     def calc_linear_speed(self):
         fd_thresh = self.dist_thresh_wf + self.dist_laser_offset
-        if self.front_dist > ( 1.2 * fd_thresh):
+        if self.front_dist > (1.2 * fd_thresh):
             forward_speed_wf = self.forward_speed_wf_fast
         else:
             forward_speed_wf = self.forward_speed_wf_slow
@@ -206,46 +222,66 @@ class WallFollower(Node):
 
     #Methode um gerade zu Wand ausrichten
     def align_front(self):
-        fl = self.distances[ROBOT_DIRECTION_LEFT_FRONT_INDEX]
-        fr = self.distances[ROBOT_DIRECTION_RIGHT_FRONT_INDEX]
-        if (fl - fr) > self.dist_hysteresis_wf:
-            return 1 #turning left
-        elif (fr - fl) > self.dist_hysteresis_wf:
-            return -1 #turning right
+        fl = self.distances_history[-1][ROBOT_DIRECTION_LEFT_FRONT_INDEX]
+        fr = self.distances_history[-1][ROBOT_DIRECTION_RIGHT_FRONT_INDEX]
+        if ( (fr - fl) > self.dist_hysteresis_wf ):
+            return 1    #turning left
+        elif ( (fl - fr) > self.dist_hysteresis_wf ):
+            return -1   #truning right
         else:
-            return 0 #aligned
+            return 0    #aligned
         
     #Methode um paralell zu Wand ausrichten
     def align_left(self):
-        fl = self.distances[ROBOT_DIRECTION_LEFT_FRONT_INDEX]
-        rl = self.distances[ROBOT_DIRECTION_LEFT_REAR_INDEX]
-        if (fl - rl) > self.dist_hysteresis_wf:
-            return 1 #turning left
-        elif (rl - fl) > self.dist_hysteresis_wf:
-            return -1 #turning right
+        lf = self.distances_history[-1][ROBOT_DIRECTION_LEFT_FRONT_INDEX]
+        lr = self.distances_history[-1][ROBOT_DIRECTION_LEFT_REAR_INDEX]
+        if (lf - lr) > self.dist_hysteresis_wf:
+            return 1    #turning left
+        elif (lr - lf) > self.dist_hysteresis_wf:
+            return -1   #truning right
         else:
-            return 0 #aligned
+            return 0    #aligned
+
+    #Methode um den Winkel zur Wand auszurechnen    
+    def calc_left_wall_angle(self):
+
+        LEFT_ANGLE_DEG = 10
+        LEFT_ANGLE_RAD =   (math.pi/180.0) * LEFT_ANGLE_DEG
+        
+        left_front_dist = self.get_dist_avg_history(ROBOT_DIRECTION_LEFT_INDEX-LEFT_ANGLE_DEG)
+        left_rear_dist = self.get_dist_avg_history(ROBOT_DIRECTION_LEFT_INDEX+LEFT_ANGLE_DEG)
+
+        dx = math.sin(LEFT_ANGLE_RAD) * (left_front_dist - left_rear_dist)
+        dy = math.cos(LEFT_ANGLE_RAD) * (left_front_dist + left_rear_dist)
+
+        left_wall_angle = math.atan2(dy, dx)
+        #if (left_wall_angle > 0):
+        #    left_wall_angle = ((math.pi/180) * 90) - left_wall_angle
 
 
     #Scan Callback, Lidar Daten holen
     def scan_callback(self, msg):
 
-        self.valid_lidar_data = True
-        self.left_dist = msg.ranges[ROBOT_DIRECTION_LEFT_INDEX]
-        self.leftfront_dist = msg.ranges[ROBOT_DIRECTION_LEFT_FRONT_INDEX]
-        self.front_dist = msg.ranges[ROBOT_DIRECTION_FRONT_INDEX]
-        self.rightfront_dist = msg.ranges[ROBOT_DIRECTION_RIGHT_FRONT_INDEX]
-        self.right_dist = msg.ranges[ROBOT_DIRECTION_RIGHT_INDEX]
-        self.rear_dist = msg.ranges[ROBOT_DIRECTION_REAR_INDEX]
-        self.distances = msg.ranges
+        self.distances_history.append(msg.ranges)
+        if (len(self.distances_history) > self.distances_histroy_size):
+            self.distances_history = self.distances_history[1:]
+        
+        self.left_dist = self.get_dist_avg_history(ROBOT_DIRECTION_LEFT_INDEX)
+        self.leftfront_dist = self.get_dist_avg_history(ROBOT_DIRECTION_LEFT_FRONT_INDEX)
+        self.front_dist = self.get_dist_avg_history(ROBOT_DIRECTION_FRONT_INDEX)
+        self.rightfront_dist = self.get_dist_avg_history(ROBOT_DIRECTION_RIGHT_FRONT_INDEX)
+        self.right_dist = self.get_dist_avg_history(ROBOT_DIRECTION_RIGHT_INDEX)
+        self.rightrear_dist = self.get_dist_avg_history(ROBOT_DIRECTION_RIGHT_REAR_INDEX)
+        self.rear_dist = self.get_dist_avg_history(ROBOT_DIRECTION_REAR_INDEX)
+        self.leftrear_dist = self.get_dist_avg_history(ROBOT_DIRECTION_LEFT_REAR_INDEX)
 
-        print("left: %.2f m\n" %self.left_dist,
-              "left front: %.2f m\n" %self.leftfront_dist,
-              "front: %.2f m\n" %self.front_dist,
-              "right front: %.2f m\n" %self.rightfront_dist,
-              "r: %.2f m\n" %self.right_dist,
-              "rear: %.2f m\n" %self.rear_dist,
-              "\n")
+        #print("left: %.2f m\n" %self.left_dist,
+        #      "left front: %.2f m\n" %self.leftfront_dist,
+        #      "front: %.2f m\n" %self.front_dist,
+        #      "right front: %.2f m\n" %self.rightfront_dist,
+        #      "r: %.2f m\n" %self.right_dist,
+        #      "rear: %.2f m\n" %self.rear_dist,
+        #      "\n")
     
 #.............................................................................................................
 
