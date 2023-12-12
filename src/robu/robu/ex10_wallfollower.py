@@ -146,7 +146,7 @@ class WallFollower(Node):
                 if turn_direction == 0:
                     print("WF_STATE_ROTATE2WALL")
                     #safe the current distances as input for the state ROTATE2WALL
-                    self.wallfollower_state_input_dist = self.self.distances_history[-1]
+                    self.wallfollower_state_input_dist = self.distances_history[-1]
                     self.wallfollower_state = WallFollowerStates.WF_STATE_ROTATE2WALL
 
 
