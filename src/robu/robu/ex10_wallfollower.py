@@ -74,7 +74,7 @@ class WallFollower(Node):
 
     #Timer Callback 
     def timer_callback(self):
-        if self.valid_lidar_data:        #warten bis gültige Lidar Daten vorhanden sind
+        if len(self.distances_history) > 0:
             self.follow_wall()
 
     #Distances History
