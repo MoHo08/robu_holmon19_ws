@@ -18,6 +18,12 @@ class MinimalParameter(Node):
         my_param = self.get_parameter('my_parameter')
 
         print("my_parameter: ", my_param)
+
+        self.timer = self.create_timer(1, self.timer_callback)
+
+    def timer_callback(self):
+        my_param = self.get_parameter('my_parameter')
+        print("my_parameter: ", my_param)
 #.............................................................................................................
 
 # Main .......................................................................................................
