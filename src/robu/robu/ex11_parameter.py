@@ -11,11 +11,12 @@ class MinimalParameter(Node):
         # Konstruktor der Elternklasse(NODE) aufrufen und Namen der Node vergeben
         super().__init__('MinimalParameter')
 
+        # Parameter Beschreibung
         from rcl_interfaces.msg import ParameterDescriptor
-        #my_parameter_description = 
+        my_parameter_description = ParameterDescriptor(description='This Parameter is mine!')
 
-        # Parameter erstellen:      name        wert
-        self.declare_parameter('my_parameter', 'work')
+        # Parameter erstellen:      name        wert            beschreibung
+        self.declare_parameter('my_parameter', 'work', my_parameter_description)
 
         # Parameter lesen
         my_param = self.get_parameter('my_parameter').get_parameter_value().string_value
@@ -28,6 +29,7 @@ class MinimalParameter(Node):
         my_param = self.get_parameter('my_parameter').value
 
         print("my_parameter: ", my_param)
+        # self.get_logger().info('Hello %s!', my_param)
         
 #.............................................................................................................
 
