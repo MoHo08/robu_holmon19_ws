@@ -11,11 +11,14 @@ class MinimalParameter(Node):
         # Konstruktor der Elternklasse(NODE) aufrufen und Namen der Node vergeben
         super().__init__('MinimalParameter')
 
-        # Parameter erstellen
-        self.declare_parameter('my_parameter')
+        from rcl_interfaces.msg import ParameterDescriptor
+        #my_parameter_description = 
+
+        # Parameter erstellen:      name        wert
+        self.declare_parameter('my_parameter', 'work')
 
         # Parameter lesen
-        my_param = self.get_parameter('my_parameter')
+        my_param = self.get_parameter('my_parameter').get_parameter_value().string_value
 
         print("my_parameter: ", my_param)
 
@@ -23,7 +26,9 @@ class MinimalParameter(Node):
 
     def timer_callback(self):
         my_param = self.get_parameter('my_parameter').value
+
         print("my_parameter: ", my_param)
+        
 #.............................................................................................................
 
 # Main .......................................................................................................
