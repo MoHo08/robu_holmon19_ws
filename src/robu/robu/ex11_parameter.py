@@ -27,26 +27,43 @@ class MinimalParameter(Node):
         # Parameter erstellen:      name        wert         beschreibung
         self.declare_parameter('my_parameter', 'work', my_parameter_description)
 
-        # Parameter lesen
-        # gibt das Objekt des Parameters zurück
-        my_param = self.get_parameter('my_parameter')
-        # gibt den Wert des Parameters zurück
-        my_param = self.get_parameter('my_parameter').get_parameter_value().string_value 
+        # mehrere Parameter erstellen
+        self.declare_parameters(namespace='', 
+                                parameters=[('forward_speed_wf_slow', 0.05),
+                                            ('forward_speed_wf_fast', 0.1),
+                                            ('turning_speed_wf_slow', 0.1),
+                                            ('turning_speed_wf_fast', 1.0),
+                                            ('dist_thresh_wf', 0.3),
+                                            ('dist_hysteresis_wf', 0.02),])
 
-        print("my_parameter: ", my_param)
+        #++++ Parameter lesen ++++
+        #++++ gibt das Objekt des Parameters zurück ++++
+        #   my_param = self.get_parameter('my_parameter')
+        #++++ gibt den Wert des Parameters zurück ++++
+        #   my_param = self.get_parameter('my_parameter').get_parameter_value().string_value 
+        #   my_param = self.get_parameter('my_parameter').value
 
         self.timer = self.create_timer(1, self.timer_callback)
 
-    def timer_callback(self):
-        my_param = self.get_parameter('my_parameter').value
 
-        print("my_parameter: ", my_param)
+    def timer_callback(self):
+        # my_param = self.get_parameter('my_parameter').value
+        # print("my_parameter: ", my_param)
         # self.get_logger().info('Hello %s!', my_param)
+
+        print("forward_speed_wf_slow: ", self.get_parameter('forward_speed_wf_slow').value)
+        print("forward_speed_wf_fast: ", self.get_parameter('forward_speed_wf_fast').value)
+        print("turning_speed_wf_slow: ", self.get_parameter('turning_speed_wf_slow').value)
+        print("turning_speed_wf_fast: ", self.get_parameter('turning_speed_wf_fast').value)
+        print("dist_thresh_wf:        ", self.get_parameter('dist_thresh_wf').value)
+        print("dist_hysteresis_wf:    ", self.get_parameter('dist_hysteresis_wf').value)
+        print("")
         
 #.............................................................................................................
 
 # Main .......................................................................................................
 def main():
+
     rclpy.init()
 
     node = MinimalParameter()
