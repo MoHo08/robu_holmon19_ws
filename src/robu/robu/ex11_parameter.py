@@ -1,3 +1,12 @@
+# Parameter sind Variablen, die veränderbar sind, während das Programm läuft
+
+# Parameter im Terminal
+# ros2 param list .... gibt alle parameter aus
+# ros2 param get <Node> <Parameter> .... git den Wert des Parameters aus
+# ros2 param set <Node> <Parameter> <Wert> .... setzt den Wert des Parameters
+
+
+
 # Datein importieren fürs senden und empfangen von Ros Datein ................................................
 import rclpy                                                        #Ros schnittstelle für Python
 from rclpy.node import Node
@@ -15,11 +24,14 @@ class MinimalParameter(Node):
         from rcl_interfaces.msg import ParameterDescriptor
         my_parameter_description = ParameterDescriptor(description='This Parameter is mine!')
 
-        # Parameter erstellen:      name        wert            beschreibung
+        # Parameter erstellen:      name        wert         beschreibung
         self.declare_parameter('my_parameter', 'work', my_parameter_description)
 
         # Parameter lesen
-        my_param = self.get_parameter('my_parameter').get_parameter_value().string_value
+        # gibt das Objekt des Parameters zurück
+        my_param = self.get_parameter('my_parameter')
+        # gibt den Wert des Parameters zurück
+        my_param = self.get_parameter('my_parameter').get_parameter_value().string_value 
 
         print("my_parameter: ", my_param)
 
