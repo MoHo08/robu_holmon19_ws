@@ -57,6 +57,7 @@ class MinimalParameter(Node):
         print("turning_speed_wf_fast: ", self.get_parameter('turning_speed_wf_fast').value)
         print("dist_thresh_wf:        ", self.get_parameter('dist_thresh_wf').value)
         print("dist_hysteresis_wf:    ", self.get_parameter('dist_hysteresis_wf').value)
+        print("my_parameter:          ",self.get_parameter('my_parameter').description)
         print("")
         
 #.............................................................................................................
