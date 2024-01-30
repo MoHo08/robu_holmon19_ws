@@ -25,7 +25,7 @@ class MinimalParameter(Node):
         my_parameter_description = ParameterDescriptor(description='This Parameter is mine!')
 
         # Parameter erstellen:      name        wert         beschreibung
-        self.declare_parameter('my_parameter', 'work', my_parameter_description)
+        self.declare_parameter('my_parameter', 0.1, my_parameter_description)
 
         # mehrere Parameter erstellen
         self.declare_parameters(namespace='', 
