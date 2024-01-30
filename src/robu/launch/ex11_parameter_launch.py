@@ -21,6 +21,7 @@ def generate_launch_description():
             name='custom_minimal_Param_node',
             output='screen',
             emulate_tty=True,
-            parameters=[{'my_parameter':0.2}]
+            parameters=[{'my_parameter':0.2},
+                        {'forward_speed_wf_slow':0.1124}]
         )
     ])
