@@ -6,6 +6,7 @@
 # ros2 param set <Node> <Parameter> <Wert> .... setzt den Wert des Parameters
 
 
+#test
 
 # Datein importieren fürs senden und empfangen von Ros Datein ................................................
 import rclpy                                                        #Ros schnittstelle für Python
