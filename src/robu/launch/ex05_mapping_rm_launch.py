@@ -17,7 +17,7 @@ def generate_launch_description():
                                    'rviz', 'tb3_cartographer.rviz')
     
     return launch.LaunchDescription([
-        launch.actions.SetEnvironmentVariable(name='ROS_DOMAIN_ID', value='2'),
+        launch.actions.SetEnvironmentVariable(name='ROS_DOMAIN_ID', value='6'),
         launch.actions.SetEnvironmentVariable(name='LDS_MODEL', value='LDS-02'),
         launch.actions.SetEnvironmentVariable(name='TURTLEBOT3_MODEL', value='burger'),
 
@@ -50,20 +50,20 @@ def generate_launch_description():
         #     shell=True,
         #     emulate_tty=True
         # ),
-        launch_ros.actions.Node(
-            package='robu',
-            executable='ex02_remotectrl',
-            name='ex02_remotectrl',
-            remappings=[                        #Topic/Service remapping
-                ('/cmd_vel', '/cmd_vel_raw'),
-            ]
-            ),
+        #launch_ros.actions.Node(
+        #    package='turtlebot3_teleopt',
+        #    executable='teleopt_keyboard',
+        #    name='remotectrl',
+        #    remappings=[                        #Topic/Service remapping
+        #        ('/cmd_vel', '/cmd_vel_raw'),
+        #    ]
+        #    ),
 
-        launch_ros.actions.Node(
-            package='robu',
-            executable='ex03_obstacle_avoidance_simple_mapping',
-            name='ex03_obstacle_avoidance_simple_mapping'
-            ),
+        #launch_ros.actions.Node(
+        #    package='robu',
+        #    executable='ex03_obstacle_avoidance_simple_mapping',
+        #    name='ex03_obstacle_avoidance_simple_mapping'
+        #    ),
 
         launch_ros.actions.Node(
            package='rviz2',
