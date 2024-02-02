@@ -10,6 +10,8 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import ThisLaunchFileDir
 
+#test
+#versuch
 
 def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
