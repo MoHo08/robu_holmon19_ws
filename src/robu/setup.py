@@ -38,6 +38,7 @@ setup(
             'mypublisher = robu.publisher_member_function:main',
             'mysubscriber = robu.subscriber_member_function:main',
             'myparameter = robu.ex11_parameter:main',
+            'ex12_fibonacci_server = robu.ex12_fibonacci_server:main', 
         ],
     },
 )
