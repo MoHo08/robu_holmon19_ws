@@ -39,6 +39,7 @@ setup(
             'mysubscriber = robu.subscriber_member_function:main',
             'myparameter = robu.ex11_parameter:main',
             'ex12_fibonacci_server = robu.ex12_fibonacci_server:main', 
+            'ex13_fibonacci_client = robu.ex13_fibonacci_client:main',
         ],
     },
 )
