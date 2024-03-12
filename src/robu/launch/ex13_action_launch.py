@@ -32,7 +32,7 @@ def generate_launch_description():
         cmd=['sleep', '5'],                 # cmd Befehl, warte 5 sec
         output = 'screen',                  # optional, Ausgabe im CMD                    
         on_exit = [ExecuteProcess(          # Am Ende (nach 5s) wird Aufgerufen
-            cmd=['ros2', 'action', 'send_goal', '--feedback', 'fibonacci', 'robu_interfaces/action/Fibonacci', '{order: 5}'],
+            cmd=['ros2', 'action', 'send_goal', '--feedback', 'fibonacci', 'robu_interfaces/action/Fibonacci', '{order: 10}'],
             output = 'screen',
             name = 'call_fibonacci_action'
             )]
