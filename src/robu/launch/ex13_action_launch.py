@@ -6,6 +6,7 @@ from launch_ros.actions import Node
 from launch.actions import SetEnvironmentVariable, ExecuteProcess, DeclareLaunchArgument, IncludeLaunchDescription, LogInfo
 # *******************************************************
 
+# *********************** KLASSE ************************
 def generate_launch_description():
 
     # ***** Variablen *****
@@ -21,10 +22,10 @@ def generate_launch_description():
     )
     # Node in Variable speichern mit notwendigen Parameter
     node_action_client = Node(
-        package='robu',                     # Pkg, wo Node drinnen
-        executable='ex13_fibonacci_client', # Node, Name laut Setup.py
-        output='screen',                    # optional, Ausgabe im CMD
-        emulate_tty = True,                 # optional, Tastatur etc. kann verwendet werden
+        package='robu',
+        executable='ex13_fibonacci_client',
+        output='screen',
+        emulate_tty = True,
     )
     # CLI-Befehle in Variable speichern
     exec_action = ExecuteProcess(
