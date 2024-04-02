@@ -20,7 +20,7 @@ def generate_launch_description():
     node_catographer = Node(
         package='turtlebot3_cartographer',
         executable='cartographer.launch.py',
-        parameters= 'use_sim_time:=True',
+        parameters=[{'use_sim_time': True}],
         output='screen',
     )
 
