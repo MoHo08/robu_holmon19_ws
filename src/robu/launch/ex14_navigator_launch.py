@@ -40,3 +40,34 @@ def generate_launch_description():
     declare_use_rviz_cmd = DeclareLaunchArgument('use_rviz', default_value=True)
     declare_headless_cmd = DeclareLaunchArgument('headless', default_value=False)
     declare_use_sim_time_cmd = DeclareLaunchArgument('use_sim_time', default_value=False)
+
+    start_gazebo_server_cmd = ExecuteProcess(
+        cmd=['gzserver', '-s', 'libgazebo_ros_init.so', '-s', 'libgzebo_ros_factory.so', world_file],
+        cwd=[tb3_world_dir],
+        output= 'screen'
+    )
+
+    start_gazebo_client_cmd = ExecuteProcess(
+        condition= IfCondition(PythonExpression(['not', headless])),
+        cmd=['gzclient'],
+        cwd=[tb3_world_dir],
+        output='screen'
+    )
+
+    start_gazevo_spawner_cmd = Node(
+        package='gazebo_ros',
+        executable='spawn_entity.py',
+        output='screen',
+        arguments=[
+           '-entity', robot_name, 
+           '-file', robot_model_file,
+           '-x', robot_pose['x'], '-y', robot_pose['y'], '-z', robot_pose['z'],
+           '-R', robot_pose['R'], '-P', robot_pose['P'], '-Y', robot_pose['Y'],
+        ]
+    )
+
+    with open(robut_urdf, 'r') as infp:
+        robot_descr = infp.read()
+
+    
+    
