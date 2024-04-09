@@ -18,4 +18,7 @@ class Nav2Pose(Node):
         super().__init__('nav2_pose')
         self.pose_sub = self.create_subscription(String, '/nav2_pose', self.nav2_pose_callback, 10)
 
-        
+        self.declare_parameters('',
+                                [
+                                    ('pose_initial', [0.0, 0.0, 0.0, 1.0])
+                                ])
