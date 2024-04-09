@@ -15,6 +15,7 @@ setup(
         (os.path.join('share', package_name, 'launch'), glob('launch/*launch.[pxy][yma]*')),
         ('share/' + package_name + '/rviz', ['rviz/tb3_cartographer.rviz']),
         ('share/' + package_name + '/config', ['config/turtlebot3_lds_2d.lua']),
+        (os.path.join('share', package_name, 'maps/tb3_world'), glob('maps/tb3_world/*.*')),
     ],
 
     install_requires=['setuptools'],
