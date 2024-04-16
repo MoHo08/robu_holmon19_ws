@@ -49,17 +49,38 @@ class Nav2Pose(Node):
 
         self.goal_poses = [initial_pose, pose_a]
 
-
+        self.goal_poses_index = -1
+        self.create_timer(1.0, self.timer_callback)
 
 
 
     def nav2_pose_callback(self, msg):
         if msg.data == "Halle A":
             self.navigator.goToPose(self.goal_poses[1])
+            self.goal_poses_index = 1
             # ros2 topic pub /nav2_pose std_msgs/msg/String "data: Halle A" -1
+            
         elif msg.data == "Home":
             self.navigator.goToPose(self.goal_poses[0])
+            self.goal_poses_index = 0
             # ros2 topic pub /nav2_pose std_msgs/msg/String "data: Home" -1
+
+    def timer_callback(self):
+        if self.goal_poses_index >= 0:
+            pose = self.goal_poses[self.goal_poses_index]
+            if not self.navigator.isTaskComplete():
+                feedback = self.navigator.getFeedback()
+                print(Duration.from_msg(feedback.estimated_time_remaining).nanoseconds / 1e9)
+            else:
+                result = self.navigator.getResult()
+                if result == TaskResult.SUCCEEDED:
+                    print("Task succeded")
+                if result == TaskResult.FAILED:
+                    print("Task failed")
+                if result == TaskResult.CANCELED:
+                    print("Task canceled")
+                self.goal_poses_index = -1
+
 
 
 def main(args=None):
