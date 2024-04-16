@@ -20,5 +20,5 @@ class Nav2Pose(Node):
 
         self.declare_parameters('',
                                 [
-                                    ('pose_initial', [0.0, 0.0, 0.0, 1.0])
+                                    ('pose_initial', [0.0, 0.0, 0.0, 1.0])  #x, y, z, w
                                 ])
