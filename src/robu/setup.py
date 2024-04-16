@@ -41,6 +41,7 @@ setup(
             'myparameter = robu.ex11_parameter:main',
             'ex12_fibonacci_server = robu.ex12_fibonacci_server:main', 
             'ex13_fibonacci_client = robu.ex13_fibonacci_client:main',
+            'ex14_nav2pose = robu.ex14_navigation:main',
         ],
     },
 )
