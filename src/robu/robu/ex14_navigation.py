@@ -28,6 +28,7 @@ class Nav2Pose(Node):
         super().__init__('nav2_pose')
         self.pose_sub = self.create_subscription(String, '/nav2_pose', self.nav2_pose_callback, 10)
 
+        # Punkte als Parameter anlegen
         self.declare_parameters('',
                                 [
                                     ('pose_initial', [0.0, 0.0, 0.0, 1.0]),  #x, y, z, w
@@ -35,7 +36,7 @@ class Nav2Pose(Node):
                                 ])
         self.navigator = BasicNavigator()
 
-
+        # Parameter als 'benutzbaren' Punkt speichern
         initial_pose = PoseStamped()
         initial_pose.header.frame_id='map'
         initial_pose.header.stamp = self.navigator.get_clock().now().to_msg()
@@ -44,9 +45,11 @@ class Nav2Pose(Node):
         initial_pose.pose.orientation.z = self.get_parameter('pose_initial').value[2]
         initial_pose.pose.orientation.w = self.get_parameter('pose_initial').value[3]
 
+        # Startposition initialisieren
         self.navigator.setInitialPose(initial_pose)
         self.navigator.waitUntilNav2Active()
 
+        # Parameter als 'benutzbaren' Punkt speichern
         pose_a = PoseStamped()
         pose_a.header.frame_id='map'
         pose_a.header.stamp = self.navigator.get_clock().now().to_msg()
@@ -55,14 +58,14 @@ class Nav2Pose(Node):
         pose_a.pose.orientation.z = self.get_parameter('pose_a').value[2]
         pose_a.pose.orientation.w = self.get_parameter('pose_a').value[3]
 
-
+        # Punkte in Feld speichern
         self.goal_poses = [initial_pose, pose_a]
 
         self.goal_poses_index = -1
         self.create_timer(1.0, self.timer_callback)
 
 
-
+    # Commando aus CMD verwerten
     def nav2_pose_callback(self, msg):
         if msg.data == "Halle A":
             self.navigator.goToPose(self.goal_poses[1])
@@ -74,6 +77,7 @@ class Nav2Pose(Node):
             self.goal_poses_index = 0
             # ros2 topic pub /nav2_pose std_msgs/msg/String "data: Home" -1
 
+    # timer callback für feedback und positionsüberprüfung
     def timer_callback(self):
         if self.goal_poses_index >= 0:
             pose = self.goal_poses[self.goal_poses_index]
