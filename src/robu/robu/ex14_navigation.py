@@ -4,6 +4,15 @@
 #3. interface list: ros2 interface show /nav2_msgs/action/NavigateToPose
 #4. action call: ros2 action send_goal /navigate_to_pose nav2_msgs/action/NavigateToPose "{pose: {header: {frame_id: 'map'}, pose: {position: {x: 3.75, y: 1.0, z: 0.01}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}}" 
 
+
+# Programm benutzen:
+# ROS_DOMIAN_ID setzen
+# ros2 run robu 'name laut setup.py' ( --ros-args -p 'parameter':='value' -p 'parameter':='value')
+# 2 terminal öffnen
+# ROS_DOMIAN_ID setzen
+# ros2 ropic list
+# ros2 topic pub /nav2_pose std_msgs/msg/String "data: 'Punkt'" -1
+
 # Phyton Programm zum navigieren
 from nav2_simple_commander.robot_navigator import BasicNavigator, TaskResult
 # https://navigation.ros.org/commander_api/index.html  Dokumentation für nav2 simpe commander
