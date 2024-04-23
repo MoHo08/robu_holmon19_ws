@@ -6,7 +6,7 @@
 #    By: Moritz Hollensteiner <moritzhollenstein    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/23 12:23:26 by Moritz Holl       #+#    #+#              #
-#    Updated: 2024/04/23 13:01:19 by Moritz Holl      ###   ########.fr        #
+#    Updated: 2024/04/23 13:03:14 by Moritz Holl      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -97,7 +97,6 @@ class Nav2Pose(Node):
             poses.append(self.goal_poses[1])
             poses.append(self.goal_poses[0])
             self.navigator.followWaypoints(poses)
-            self.goal_poses_index= 0
             # ros2 topic pub /nav2_pose std_msgs/msg/String "data: Abfolge" -1
 
     # timer callback für feedback und positionsüberprüfung
