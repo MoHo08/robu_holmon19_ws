@@ -12,6 +12,7 @@ def generate_launch_description():
     # ***** Variablen *****
     mypackage = get_package_share_directory('robu')
     domain_id = SetEnvironmentVariable(name='ROS_DOMAIN_ID', value='8')
+    # parameter_yaml = os.path.join(get_package_share_directory('mein_package'), 'params.yaml') # Yaml-Datei mit Parameter in lokale Variable speichern
 
     # Node in Variable speichern mit notwendigen Parameter
     node_action_server = Node(
@@ -19,6 +20,8 @@ def generate_launch_description():
         executable='ex12_fibonacci_server', # Node, Name laut Setup.py
         output='screen',                    # optional, Ausgabe im CMD
         emulate_tty = True,                 # optional, Tastatur etc. kann verwendet werden
+        # parameters =[{ 'Parametername1': Parameterwert1 , 'Parametername2':Parameterwert2 }] , # optional , Parameter in Launch Datei setzen
+        # parameters =[ parameter_yaml ] # optional , Parameter mit Yaml Datei übergeben
     )
     # Node in Variable speichern mit notwendigen Parameter
     node_action_client = Node(
@@ -37,6 +40,7 @@ def generate_launch_description():
             name = 'call_fibonacci_action'
             )]
     )
+    
     # LauchDescription speichern, alle Variablen da rein
     ld = LaunchDescription()
     ld.add_action(domain_id)
